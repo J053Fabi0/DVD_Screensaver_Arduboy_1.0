@@ -13,34 +13,15 @@ version 2.1 of the License, or (at your option) any later version.
 */
 
 #include "Arduboy.h"
+#include "DVD_bitmaps.h"
+
 
 // Make an instance of arduboy used for many functions
 Arduboy arduboy;
 
 // Variables for your game go here.
-const unsigned char image[] PROGMEM = {
-  0x80, 0xf1, 0xff, 0xff, 0xdf, 0xc3, 0xc3, 0xe3, 
-  0x67, 0x7f, 0x3f, 0x1f, 0x0f, 0x7f, 0xfe, 0xe0, 
-  0x70, 0x38, 0x1c, 0x0f, 0x87, 0xff, 0xff, 0xff, 
-  0xc7, 0xc3, 0xc3, 0xe3, 0x7f, 0x7f, 0x3e, 0x10, 
-  0x18, 0x38, 0x38, 0x3c, 0xbc, 0x3c, 0xbc, 0x3c, 
-  0x3c, 0xbc, 0x24, 0x24, 0xa4, 0xa5, 0x24, 0x24, 
-  0x24, 0xbc, 0xbc, 0xbc, 0x3c, 0x3c, 0xbc, 0xbc, 
-  0x3c, 0x38, 0x18, 0x18, 0x10, 0x00, 0x00, 0x00, 
-  0x00, 0x00, 0x00, 0x03, 0x04, 0x03, 0x00, 0x00, 
-  0x07, 0x00, 0x00, 0x07, 0x04, 0x03, 0x00, 0x00, 
-  0x07, 0x06, 0x04, 0x00, 0x03, 0x04, 0x04, 0x03, 
-  0x00, 0x00, 0x00, 0x00, 0x00,  
-};
 
 
-
-byte x;
-byte y;
-int speed = 1;
-int state = 1;
-
-// Width of each charcter including inter-character space
 #define WIDTH 31
 #define HEIGHT 19
 
@@ -50,7 +31,13 @@ int state = 1;
 #define X_MIN (0)
 #define Y_MIN (0)
 
-bool isInverted = false;
+byte x = (rand()%X_MAX)+1;
+byte y = (rand()%Y_MAX)+1;
+int speed = 1;
+int state = 1;
+
+bool sound = false;
+int delai = 30;
 
 // This function runs once in your game.
 // use it for anything that needs to be set only once in your game.
@@ -62,9 +49,14 @@ void setup() {
   // it saves us battery life.
   arduboy.setFrameRate(60);
   
-  // set x and y to the middle of the screen
-  x = (64 - (WIDTH/2));
-  y = (32 - (HEIGHT / 2));
+
+}
+
+
+void playSound(){
+  if(sound == true){
+    arduboy.tunes.tone(250, 150);
+  }
 }
 
 
@@ -82,12 +74,15 @@ void loop() {
          
          if (x >= X_MAX && y < Y_MAX) {
              state = 2;
+             playSound();
          }
          else if (x < X_MAX && y >= Y_MAX) {
              state = 4;
+             playSound();
          } 
          else if (x >= X_MAX && y >= Y_MAX) {
              state = 3;
+             playSound();
          }
 //         switch(isInverted){
 //            case(true){
@@ -101,12 +96,15 @@ void loop() {
          y+=speed;
          if ( y >= Y_MAX && x >= X_MIN && x <= X_MAX) {
              state = 3;
+             playSound();
          }
          else if ( y < Y_MAX && x <= X_MIN) {
              state = 1;
+             playSound();
          }
          else if ( y >= Y_MAX && x <= X_MIN) {
              state = 4;
+             playSound();
          }
          break;
       case(3):
@@ -114,12 +112,15 @@ void loop() {
          y-=speed;
          if (x <= X_MIN && y > Y_MIN && y < Y_MAX) {
              state = 4;
+             playSound();
          } 
          else if (x <= X_MIN && y <= Y_MIN) {
              state = 1;
+             playSound();
          }
          else if (x > X_MIN && y <= Y_MIN && x < X_MAX) {
              state = 2;
+             playSound();
          }
          break;
       case(4):
@@ -127,31 +128,50 @@ void loop() {
          y-=speed;
          if (x >= X_MAX && y <= Y_MIN) {
              state = 2;
+             playSound();
          }
          else if (x >= X_MAX && y < Y_MAX && y > Y_MIN) {
              state = 3;
+             playSound();
          }
          else if (x < X_MAX && x > X_MIN && y <= Y_MIN) {
              state = 1;
+             playSound();
          }
          break;
       
     }
 
-    if (arduboy.pressed(A_BUTTON)) {
-        arduboy.invert(true);
-    } else if (arduboy.pressed(B_BUTTON)) {
-        arduboy.invert(false);
+
+    if(arduboy.pressed(DOWN_BUTTON)  && delai <= 60){
+      delai++;
+    }
+    if(arduboy.pressed(UP_BUTTON) && delai >= 1){
+      delai--;
+    }
+    if(arduboy.pressed(LEFT_BUTTON)){
+      delai = 30;
+    }
+    if(arduboy.pressed(RIGHT_BUTTON)){
+      x = (rand()%X_MAX)+1;
+      y = (rand()%Y_MAX)+1;
+    }
+    
+    if(arduboy.pressed(A_BUTTON)){
+      sound = false;
+    }
+    if(arduboy.pressed(B_BUTTON)){
+      sound = true;
     }
 
 
   // we clear our screen to black
   arduboy.clear();
 
-  delay(30);
+  delay(delai);
 
   // then we print to screen what is stored in our image variable we declared earlier
-  arduboy.drawBitmap(x, y, image, WIDTH, HEIGHT, 1);
+  arduboy.drawBitmap(x, y, dvdImage, WIDTH, HEIGHT, 1);
 
   // then we finaly we tell the arduboy to display what we just wrote to the display.
   arduboy.display();
