@@ -12,8 +12,9 @@ License as published by the Free Software Foundation; either
 version 2.1 of the License, or (at your option) any later version.
 */
 
-#include "Arduboy.h"
+#include <Arduboy.h>
 #include "DVD_bitmaps.h"
+#include "funciones.h"
 
 
 // Make an instance of arduboy used for many functions
@@ -59,15 +60,8 @@ void playSound(){
   }
 }
 
-
-// our main game loop, this runs once every cycle/frame.
-// this is where our game logic goes.
-void loop() {
-  // pause render until it's time for the next frame
-  if (!(arduboy.nextFrame()))
-    return;
-
-    switch(state){
+void moveDVD(){
+   switch(state){
       case(1):
          x += speed;
          y += speed;
@@ -79,17 +73,11 @@ void loop() {
          else if (x < X_MAX && y >= Y_MAX) {
              state = 4;
              playSound();
-         } 
+         }
          else if (x >= X_MAX && y >= Y_MAX) {
              state = 3;
              playSound();
          }
-//         switch(isInverted){
-//            case(true){
-//              arduboy.invert(false);
-//              isInverted = true;
-//            }
-//         }
          break;
       case(2):
          x-=speed;
@@ -141,13 +129,16 @@ void loop() {
          break;
       
     }
+}
 
-
+void buttons(){
     if(arduboy.pressed(DOWN_BUTTON)  && delai <= 60){
       delai++;
+      arduboy.tunes.tone(delai*4, 80);
     }
     if(arduboy.pressed(UP_BUTTON) && delai >= 1){
       delai--;
+      arduboy.tunes.tone(delai*4, 80);
     }
     if(arduboy.pressed(LEFT_BUTTON)){
       delai = 30;
@@ -155,6 +146,8 @@ void loop() {
     if(arduboy.pressed(RIGHT_BUTTON)){
       x = (rand()%X_MAX)+1;
       y = (rand()%Y_MAX)+1;
+      while(arduboy.pressed(RIGHT_BUTTON)){}
+      arduboy.tunes.tone(440, 40);
     }
     
     if(arduboy.pressed(A_BUTTON)){
@@ -163,16 +156,42 @@ void loop() {
     if(arduboy.pressed(B_BUTTON)){
       sound = true;
     }
+}
+
+void drawImage(int image){
+  if(image == 1){
+    arduboy.drawBitmap(x, y, dvdImage, WIDTH, HEIGHT, 1);
+  }else if(image == 2){
+    arduboy.drawBitmap(120/2 - 32/2 +4, 64/2 - 40/2, youWin, 32, 40, 1);
+  }
+}
 
 
-  // we clear our screen to black
+void loop() {
+  if (!(arduboy.nextFrame()))
+    return;
+
+  buttons();
+
   arduboy.clear();
 
-  delay(delai);
+  delay(delai); //delai is the time it´ll wait until the next frame, is used to slow the dvd
+  
+//  arduboy.drawBitmap(x, y, dvdImage, WIDTH, HEIGHT, 1);
 
-  // then we print to screen what is stored in our image variable we declared earlier
-  arduboy.drawBitmap(x, y, dvdImage, WIDTH, HEIGHT, 1);
 
-  // then we finaly we tell the arduboy to display what we just wrote to the display.
+  if(y >= 47){
+    drawImage(2);
+  }else{
+    moveDVD();
+    drawImage(1);
+  }
+  
+  arduboy.setCursor(0, 0);
+  arduboy.print(delai*4);
+  arduboy.setCursor(0, 10);
+  arduboy.print(y);
+
+
   arduboy.display();
 }
