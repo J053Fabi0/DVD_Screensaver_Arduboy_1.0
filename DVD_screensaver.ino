@@ -33,27 +33,36 @@
   
   byte x = (rand()%X_MAX)+1;
   byte y = (rand()%Y_MAX)+1;
+  
   int speed = 1;
   int state = 1;
   int volumeImage = 1; //1 = off   2 = on
+  int timer;
+  int cornerHited;
   
   bool sound = false;
   int delai = 30;
-  
-  // This function runs once in your game.
-  // use it for anything that needs to be set only once in your game.
+
   void setup() {
-    //initiate arduboy instance
     arduboy.beginNoLogo();
-  
-    // here we set the framerate to 30, we do not need to run at default 60 and
-    // it saves us battery life.
     arduboy.setFrameRate(60);
-    
-  
   }
 
 
+  void hitCorner(){
+    if(x >= X_MAX-1 && y >= Y_MAX-1){
+      timer = 20;
+      drawExplotion();
+    }
+    if(timer > 0){
+      drawExplotion();
+      timer--;
+    }
+  }
+
+  void drawExplotion(){
+    arduboy.drawBitmap(120, 56, downRight, 8, 8, 1);
+  }
   
   
   void playSound(){
@@ -216,6 +225,7 @@
     arduboy.clear();
 
     buttons();
+    hitCorner();
   
     delay(delai); //delai is the time it´ll wait until the next frame, is used to slow the dvd
       
