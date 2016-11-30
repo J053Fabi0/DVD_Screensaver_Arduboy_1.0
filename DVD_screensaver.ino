@@ -72,6 +72,13 @@
   }
   
   void moveDVD(){
+
+    if(y >= 45 && x <= 0){
+       y = 44;
+       x = 1;
+       state = 4;
+    }
+    
      switch(state){
         case(1):
            x += speed;
@@ -202,12 +209,8 @@
     }
   }
   
-  void drawImage(int image, int volume){
-    if(image == 1){
-      arduboy.drawBitmap(x, y, dvdImage, WIDTH, HEIGHT, 1);
-    }else if(image == 2){
-      arduboy.drawBitmap(120/2 - 32/2 +4, 64/2 - 40/2, youWin, 32, 40, 1);
-    }
+  void drawImage(int volume){
+    arduboy.drawBitmap(x, y, dvdImage, WIDTH, HEIGHT, 1);
   
     if(volumeImage == 1){
       arduboy.drawBitmap(0, 0, volumeOff, 11, 11, 1);
@@ -224,18 +227,18 @@
   
     arduboy.clear();
 
+    
+    
     buttons();
     hitCorner();
   
     delay(delai); //delai is the time it´ll wait until the next frame, is used to slow the dvd
       
-    if(y >= 47){
-      drawImage(2, volumeImage);
-    }else{
-      moveDVD();
-      drawImage(1, volumeImage);
-    }
-
+    moveDVD();
+    drawImage(volumeImage);
+    
+    
+    
     arduboy.display();
   }
 
