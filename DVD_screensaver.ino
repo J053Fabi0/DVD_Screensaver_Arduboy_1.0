@@ -37,8 +37,10 @@
   int speed = 1;
   int state = 1;
   int volumeImage = 1; //1 = off   2 = on
-  int timer;
   int cornerHited;
+
+  int timerExplotion;
+  int timerSpeed;
   
   bool sound = false;
   int delai = 30;
@@ -51,12 +53,12 @@
 
   void hitCorner(){
     if(x >= X_MAX-1 && y >= Y_MAX-1){
-      timer = 20;
+      timerExplotion = 20;
       drawExplotion();
     }
-    if(timer > 0){
+    if(timerExplotion > 0){
       drawExplotion();
-      timer--;
+      timerExplotion--;
     }
   }
 
@@ -150,19 +152,25 @@
   }
   
   void buttons(){
-      if(arduboy.pressed(DOWN_BUTTON)  && delai <= 60){ //60÷5 == 12
+      if(arduboy.pressed(DOWN_BUTTON)  && delai <= 60){
         delai++;
-        drawVolume(delai);
+        timerSpeed = 15;
       }
       
       if(arduboy.pressed(UP_BUTTON) && delai >= 1){
         delai--;
-        drawVolume(delai);
+        timerSpeed = 15;
       }
+
+      if(timerSpeed > 0){
+        drawVolume(delai);
+        timerSpeed--;
+      }
+
       
       if(arduboy.pressed(LEFT_BUTTON)){
         delai = 30;
-        drawVolume(delai);
+        timerSpeed = 15;
       }
       
       if(arduboy.pressed(RIGHT_BUTTON)){
@@ -224,20 +232,18 @@
   void loop() {
     if (!(arduboy.nextFrame()))
       return;
-  
+    
     arduboy.clear();
-
     
     
     buttons();
     hitCorner();
   
-    delay(delai); //delai is the time it´ll wait until the next frame, is used to slow the dvd
+    delay(delai); //delai is the time it´ll wait until the next frame, is used to slow the DVD
       
     moveDVD();
     drawImage(volumeImage);
-    
-    
+
     
     arduboy.display();
   }
