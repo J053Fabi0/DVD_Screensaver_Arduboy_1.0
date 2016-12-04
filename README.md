@@ -1,4 +1,4 @@
-DVD sceensaver Arduboy 1.0
+DVD screensaver Arduboy 1.0
 ==============================
 > This DVD game it has only been tested for Arduboy 1.0
 
