@@ -31,11 +31,12 @@
   #define X_MIN (0)
   #define Y_MIN (0)
   
-  byte x = (rand()%X_MAX)+1;
-  byte y = (rand()%Y_MAX)+1;
+  #define speed 1
   
-  int speed = 1;
-  int state = 1;
+  byte x;
+  byte y;
+  int state;
+  
   int volumeImage = 1; //1 = off   2 = on
   int cornerHited;
 
@@ -48,6 +49,10 @@
   void setup() {
     arduboy.beginNoLogo();
     arduboy.setFrameRate(60);
+    
+    x = (rand()%X_MAX)+1;
+    y = (rand()%Y_MAX)+1;
+    state = (rand()%4)+1;
   }
 
 
